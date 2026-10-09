@@ -107,10 +107,11 @@ void TargetOverlay::overlayLoop()
 				std::cout << "Saving current ForegorundWindow HWND: " << last_foreground_window_ << std::endl;
 				std::cout << "Activating OverlayWindow" << std::endl;
 
-				SetWindowLong(window_.getSystemHandle(), GWL_EXSTYLE, WS_EX_LAYERED); //make overlay window clickable
-
-																					  //Actually activate the overlaywindow
+					// Focus first, then change Z-order without activating the window again.
 				stealFocus(window_.getSystemHandle());
+					SetWindowLong(window_.getSystemHandle(), GWL_EXSTYLE, WS_EX_LAYERED); //make overlay window clickable
+					SetWindowPos(window_.getSystemHandle(), HWND_TOP, 0, 0, 0, 0,
+						SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 
 				//Move the mouse cursor inside the overlaywindow
 				//this is neccessary because steam doesn't want to switch to big picture bindings if mouse isn't inside
@@ -122,6 +123,8 @@ void TargetOverlay::overlayLoop()
 			{
 				//make overlaywindow clickthrough - WS_EX_TRANSPARENT - again
 				SetWindowLong(window_.getSystemHandle(), GWL_EXSTYLE, WS_EX_LAYERED | WS_EX_TRANSPARENT);
+					SetWindowPos(window_.getSystemHandle(), HWND_TOPMOST, 0, 0, 0, 0,
+						SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 
 				std::cout << "Switching to previously focused window" << std::endl;
 
